@@ -8,6 +8,11 @@ import axios from "axios";
 import Table from "@/components/Table";
 import Input from "@/components/Input";
 
+import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
+
+
 const ColumnsWrapper = styled.div`
   display: grid;
   grid-template-columns: 1fr;
@@ -102,14 +107,28 @@ export default function CartPage() {
     removeProduct(id);
   }
   async function goToPayment() {
-    const response = await axios.post('/api/checkout', {
-      name,email,city,postalCode,streetAddress,country,
-      cartProducts,
-    });
-    if (response.data.url) {
-      window.location = response.data.url;
+    try {
+      const response = await axios.post('/api/checkout', {
+        name, email, city, postalCode, streetAddress, country,
+        cartProducts,
+      });
+
+      if (response.data.url) {
+        window.location = response.data.url;
+      }
+
+      // Show success message
+      toast.success('Payment added successfully', {
+        position: toast?.POSITION?.TOP_CENTER,
+      });
+    } catch (error) {
+      // Show error message
+      toast.error('Failed to proceed with payment', {
+        position: toast?.POSITION?.TOP_CENTER,
+      });
     }
   }
+  
   let total = 0;
   for (const productId of cartProducts) {
     const price = products.find(p => p._id === productId)?.price || 0;
